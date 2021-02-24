@@ -27,6 +27,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 import org.wso2.am.integration.clients.store.api.v1.dto.CommentDTO;
+import org.wso2.am.integration.clients.store.api.v1.dto.PostRequestBodyDTO;
 import org.wso2.am.integration.clients.store.api.v1.dto.RatingDTO;
 import org.wso2.am.integration.test.utils.base.APIMIntegrationBaseTest;
 import org.wso2.am.integration.test.utils.bean.APILifeCycleAction;
@@ -107,8 +108,14 @@ import static org.testng.Assert.assertTrue;
         //-------------------------Test Comments------------------------------------------
 
         // Test add comments
-        String comment = "This is a test comment";
-        HttpResponse addCommentResponse = restAPIStore.addComment(apiId, comment);
+//        String apiId, String comment, PostRequestBodyDTO postRequestBodyDTO, String replyTo
+//        String comment = "This is a test comment";
+//        java.lang.String,java.lang.String,org.wso2.am.integration.clients.store.api.v1.dto.PostRequestBodyDTO,java.lang.String
+//        java.lang.String,org.wso2.am.integration.clients.store.api.v1.dto.PostRequestBodyDTO,java.lang.String
+        PostRequestBodyDTO postRequestBodyDTO = new PostRequestBodyDTO();
+        postRequestBodyDTO.setContent("This is a test comment");
+        postRequestBodyDTO.setCategory("general");
+        HttpResponse addCommentResponse = restAPIStore.addComment(apiId , postRequestBodyDTO, "null");
         assertNotNull(addCommentResponse, "Error adding comment");
         assertEquals(addCommentResponse.getResponseCode(), Response.Status.CREATED.getStatusCode(),
                 "Response code mismatched");
@@ -116,13 +123,15 @@ import static org.testng.Assert.assertTrue;
         assertNotNull(commentId, "Comment Id is null");
 
         // Verify added comment
+//        String commentId, String apiId, String xWSO2Tenant, String ifNoneMatch,
+//                Boolean includeCommenterInfo, Integer replyLimit, Integer replyOffset
         HttpResponse getCommentResponse = restAPIStore
-                .getComment(commentId, apiId, gatewayContextWrk.getContextTenant().getDomain(), false);
+                .getComment(commentId, apiId, gatewayContextWrk.getContextTenant().getDomain(), null, false, 10, 0);
         assertEquals(getCommentResponse.getResponseCode(), Response.Status.OK.getStatusCode(),
                 "Error retrieving comment");
         Gson g = new Gson();
         CommentDTO commentDTO = g.fromJson(getCommentResponse.getData(), CommentDTO.class);
-        assertEquals(commentDTO.getContent(), comment, "Comments do not match");
+        assertEquals(commentDTO.getContent(), postRequestBodyDTO.getContent(), "Comments do not match");
 
         // Test delete comments
         HttpResponse deleteResponse = restAPIStore.removeComment(commentId, apiId);

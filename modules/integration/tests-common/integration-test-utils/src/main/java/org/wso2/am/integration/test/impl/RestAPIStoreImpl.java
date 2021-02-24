@@ -1189,9 +1189,9 @@ public class RestAPIStoreImpl {
      * @return - http response of add comment
      * @throws ApiException - throws if add comment fails
      */
-    public HttpResponse addComment(String apiId, String comment, PostRequestBodyDTO postRequestBodyDTO, String replyTo) throws ApiException {
-        CommentDTO commentDTO = new CommentDTO();
-        commentDTO.setContent(comment);
+    public HttpResponse addComment(String apiId, PostRequestBodyDTO postRequestBodyDTO, String replyTo) throws ApiException {
+//        CommentDTO commentDTO = new CommentDTO();
+//        commentDTO.setContent(comment);
         ApiResponse<CommentDTO> apiResponse = commentsApi.addCommentToAPIWithHttpInfo(apiId, postRequestBodyDTO, replyTo);
         Assert.assertEquals(HttpStatus.SC_CREATED, apiResponse.getStatusCode());
         HttpResponse response = null;
@@ -1228,8 +1228,7 @@ public class RestAPIStoreImpl {
      * @return - http response get comment
      * @throws ApiException - throws if get comment fails
      */
-//    String commentId, String apiId, String xWSO2Tenant, String ifNoneMatch, Boolean includeCommenterInfo, Integer replyLimit, Integer replyOffset
-    public HttpResponse getComment(String commentId, String apiId, String xWSO2Tenant, String ifNoneMatch,
+   public HttpResponse getComment(String commentId, String apiId, String xWSO2Tenant, String ifNoneMatch,
                                    Boolean includeCommenterInfo, Integer replyLimit, Integer replyOffset)
             throws ApiException {
         CommentDTO commentDTO;
