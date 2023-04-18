@@ -628,7 +628,7 @@ public class ServerRestartTestCase extends APIManagerLifecycleBaseTest {
         restartServer();
     }
 
-    protected static void restartServer() throws Exception {
+    private void restartServer() throws Exception {
         AutomationContext superTenantKeyManagerContext = new AutomationContext(APIMIntegrationConstants.AM_PRODUCT_GROUP_NAME,
                 APIMIntegrationConstants.AM_KEY_MANAGER_INSTANCE,
                 TestUserMode.SUPER_TENANT_ADMIN);
