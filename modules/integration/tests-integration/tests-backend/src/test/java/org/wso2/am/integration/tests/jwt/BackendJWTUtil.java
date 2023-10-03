@@ -49,20 +49,13 @@ public class BackendJWTUtil {
      * verify JWT Header
      *
      * @param decodedJWTHeaderString decoded JWT Header value
-     * @param jwksKidClaim           kid claim in JWKS endpoint
      * @throws JSONException if JSON payload is malformed
      */
-    public static void verifyJWTHeader(String decodedJWTHeaderString, String jwksKidClaim) throws JSONException {
+    public static void verifyJWTHeader(String decodedJWTHeaderString) throws JSONException {
         JSONObject jsonHeaderObject = new JSONObject(decodedJWTHeaderString);
         Assert.assertEquals(jsonHeaderObject.getString("typ"), "JWT");
         Assert.assertEquals(jsonHeaderObject.getString("alg"), "RS256");
-
-        // Verify kid claim: check if kid claim in JWT header match with that of JWKS endpoint
-        Assert.assertTrue(jsonHeaderObject.has("kid"));
-        if (jwksKidClaim != null) {
-            Assert.assertEquals(jsonHeaderObject.getString("kid"), jwksKidClaim, "kid claim in JWT header " +
-                    "does not match with that of JWKS endpoint");
-        }
+        Assert.assertFalse(jsonHeaderObject.has("kid"));
     }
 
     /**

@@ -28,7 +28,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -77,7 +76,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.ws.rs.core.Response;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -109,7 +107,6 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
     URL tokenEndpointURL;
     private String tokenURL;
     private String identityLoginURL;
-    private String jwksKidClaim;
     private final String CALLBACK_URL = "https://localhost:9443/store/";
 
     @BeforeClass(alwaysRun = true)
@@ -194,16 +191,6 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
                 APIMIntegrationConstants.IS_API_EXISTS);
         waitForAPIDeploymentSync(user.getUserName(), api2Request.getName(), api2Request.getVersion(),
                 APIMIntegrationConstants.IS_API_EXISTS);
-
-        // Invoke JWKS endpoint and retrieve kid claim to validate backend JWT
-        HttpClient httpclient = HttpClientBuilder.create().build();
-        HttpGet jwksGet = new HttpGet(getAPIInvocationURLHttp("jwks"));
-        HttpResponse jwksResponse = httpclient.execute(jwksGet);
-        assertEquals(jwksResponse.getStatusLine().getStatusCode(), HTTP_RESPONSE_CODE_OK,
-                "Invocation fails for JWKS GET request");
-        String jwksResponseString = EntityUtils.toString(jwksResponse.getEntity(), "UTF-8");
-        JSONObject jwksResponseObject = new JSONObject(jwksResponseString);
-        jwksKidClaim = jwksResponseObject.getJSONArray("keys").getJSONObject(0).getString("kid");
     }
 
     @Test(groups = {"wso2.am"}, description = "Backend JWT Token Generation for Oauth Based App")
@@ -238,7 +225,7 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
             //Do the signature verification for super tenant as tenant key store not there accessible
             BackendJWTUtil.verifySignature(jwtheader);
             log.debug("Decoded JWT header String = " + decodedJWTHeaderString);
-            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString, jwksKidClaim);
+            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString);
             JSONObject jsonObject = new JSONObject(decodedJWTString);
             log.info("JWT Received ==" + jsonObject.toString());
             //Validate expiry time
@@ -286,7 +273,7 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
             //Do the signature verification
             BackendJWTUtil.verifySignature(jwtheader);
             log.debug("Decoded JWT header String = " + decodedJWTHeaderString);
-            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString, jwksKidClaim);
+            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString);
             JSONObject jsonObject = new JSONObject(decodedJWTString);
 
             // check default claims
@@ -354,7 +341,7 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
         //Do the signature verification
         BackendJWTUtil.verifySignature(jwtheader);
         log.debug("Decoded JWT header String = " + decodedJWTHeaderString);
-        BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString, jwksKidClaim);
+        BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString);
         JSONObject jsonObject = new JSONObject(decodedJWTString);
 
         // check default claims
@@ -399,7 +386,7 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
         //Do the signature verification
         BackendJWTUtil.verifySignature(jwtheader);
         log.debug("Decoded JWT header String = " + decodedJWTHeaderString);
-        BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString, jwksKidClaim);
+        BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString);
         JSONObject jsonObject = new JSONObject(decodedJWTString);
 
         // check default claims
@@ -447,7 +434,7 @@ public class JWTTestCase extends APIManagerLifecycleBaseTest {
             //Do the signature verification
             BackendJWTUtil.verifySignature(jwtheader);
             log.debug("Decoded JWT header String = " + decodedJWTHeaderString);
-            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString, jwksKidClaim);
+            BackendJWTUtil.verifyJWTHeader(decodedJWTHeaderString);
             JSONObject jsonObject = new JSONObject(decodedJWTString);
 
             // check default claims
