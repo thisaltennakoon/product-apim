@@ -82,6 +82,58 @@
 <retriesBeforeSuspension>#print_if_exist( $config.get("retryTimeOut") 0)</retriesBeforeSuspension>
 <retryDelay>#print_if_exist( $config.get("retryDelay") 0)</retryDelay>
 </markForSuspension>
+#if($endpoint_config.get("enable_retry_call_with_new_token"))
+        #set( $endpointSecurity = $endpoint_config.get("endpoint_security").get($type) )
+        #if($endpointSecurity.type == "oauth" || $endpointSecurity.type == "OAUTH")
+            <authentication>
+                <oauth>
+                    #if($endpointSecurity.grantType == "client_credentials" || $endpointSecurity.grantType == "CLIENT_CREDENTIALS")
+                        <clientCredentials>
+                            <clientId>$util.escapeXml($endpointSecurity.clientId)</clientId>
+                            <clientSecret>$util.escapeXml($endpointSecurity.clientSecret)</clientSecret>
+                            <tokenUrl>$util.escapeXml($endpointSecurity.tokenUrl)</tokenUrl>
+                            <connectionTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").connection_timeout)</connectionTimeout>
+                            <connectionRequestTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").connection_request_timeout)</connectionRequestTimeout>
+                            <socketTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").socket_timeout)</socketTimeout>
+                            #set($requestParametersMap = $util.jsonToMap($endpointSecurity.customParameters))
+                            #if($requestParametersMap.size() > 0)
+                            <requestParameters>
+                                #foreach($entry in $requestParametersMap.entrySet())
+                                <parameter name="$util.escapeXml($entry.key)">$util.escapeXml($entry.value)</parameter>
+                                #end
+                            </requestParameters>
+                            <authMode/>
+                            #if($endpoint_config.get("is_redis_enabled"))
+                                <tokenCacheClass>org.wso2.carbon.apimgt.gateway.mediators.oauth.RedisTokenCache</tokenCacheClass>
+                            #end
+                        </clientCredentials>
+                    #elseif($endpointSecurity.grantType == "password" || $endpointSecurity.grantType == "PASSWORD")
+                        <passwordCredentials>
+                            <username>$util.escapeXml($endpointSecurity.username)</username>
+                            <password>$util.escapeXml($endpointSecurity.password)</password>
+                            <clientId>$util.escapeXml($endpointSecurity.clientId)</clientId>
+                            <clientSecret>$util.escapeXml($endpointSecurity.clientSecret)</clientSecret>
+                            <tokenUrl>$util.escapeXml($endpointSecurity.tokenUrl)</tokenUrl>
+                            <connectionTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").connection_timeout)</connectionTimeout>
+                            <connectionRequestTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").connection_request_timeout)</connectionRequestTimeout>
+                            <socketTimeout>$util.escapeXml($endpoint_config.get("endpoint_connection_config").socket_timeout)</socketTimeout>
+                            #set($requestParametersMap = $util.jsonToMap($endpointSecurity.customParameters))
+                            #if($requestParametersMap.size() > 0)
+                            <requestParameters>
+                                #foreach($entry in $requestParametersMap.entrySet())
+                                <parameter name="$util.escapeXml($entry.key)">$util.escapeXml($entry.value)</parameter>
+                                #end
+                            </requestParameters>
+                            <authMode/>
+                            #if($endpoint_config.get("is_redis_enabled"))
+                                <tokenCacheClass>org.wso2.carbon.apimgt.gateway.mediators.oauth.RedisTokenCache</tokenCacheClass>
+                            #end
+                        </passwordCredentials>
+                    #end
+                </oauth>
+            </authentication>
+        #end
+#end
         #end
 #end
 
